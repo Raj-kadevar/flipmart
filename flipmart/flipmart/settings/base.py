@@ -183,10 +183,6 @@ WSGI_APPLICATION = "flipmart.wsgi.application"
 
 INSTALLED_APPS = [
     "user.apps.UsersConfig",
-
-    
-    
-
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -197,10 +193,12 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "rest_framework",
     "rest_framework.authtoken",
+    "django_extensions",
+
 ]
 
 AUTH_USER_MODEL = "user.User"
-LOGIN_REDIRECT_URL = "user:redirect"
+LOGIN_REDIRECT_URL = "registration"
 
 AUTH_PASSWORD_VALIDATORS = [
     {

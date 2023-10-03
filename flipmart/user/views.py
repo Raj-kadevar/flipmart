@@ -1,42 +1,33 @@
-from django.contrib import messages
-from django.contrib.auth import get_user_model
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.urls import reverse
-from django.utils.translation import gettext_lazy as _
-from django.views.generic import DetailView, RedirectView, UpdateView
+from django.contrib.auth.views import LoginView
+from django.shortcuts import redirect, render
+from django.views.generic import CreateView
+from rest_framework import status
 
-User = get_user_model()
+from user.forms import Registration
 
 
-class UserDetailView(LoginRequiredMixin, DetailView):
-
-    model = User
-    slug_field = "username"
-    slug_url_kwarg = "username"
+class IndexView:
+    pass
 
 
-class UserUpdateView(LoginRequiredMixin, UpdateView):
+class UserLoginView(LoginView):
+    template_name = "login.html"
 
-    model = User
-    fields = ["name"]
-
-    def get_success_url(self):
-        return reverse("user:detail", kwargs={"username": self.request.user.username})
-
-    def get_object(self):
-        return User.objects.get(username=self.request.user.username)
-
-    def form_valid(self, form):
-        messages.add_message(
-            self.request, messages.INFO, _("Infos successfully updated")
-        )
-        return super().form_valid(form)
+    def form_invalid(self, form):
+        return render(self.request, "login.html", {'error': 'username or password invalid','form':form},
+                      status=status.HTTP_400_BAD_REQUEST)
 
 
-class UserRedirectView(LoginRequiredMixin, RedirectView):
+class RegistrationView(CreateView):
+    form_class = Registration
+    template_name = "form.html"
 
-    permanent = False
+    def post(self, request, *args, **kwargs):
 
-    def get_redirect_url(self):
-        return reverse("user:detail", kwargs={"username": self.request.user.username})
-
+        user = Registration(request.POST)
+        if user.is_valid():
+            user.save()
+            return redirect('login')
+        else:
+            errors = user.errors
+            return render(request, "form.html", {"errors": errors, "form": user}, status=status.HTTP_400_BAD_REQUEST)
