@@ -1,11 +1,16 @@
 from .base import *
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": ":memory:",
+    'default': {
+        'ENGINE': env.str('ENGINE'),
+        'NAME': env.str('NAME'),
+        'USER': env.str('USER_NAME'),
+        'PASSWORD': env.str('PASSWORD'),
+        'HOST': env.str('HOST'),
+        'PORT': env.str('PORT'),
     }
 }
+
 
 ALLOWED_HOSTS = ['*']
 

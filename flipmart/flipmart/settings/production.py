@@ -32,27 +32,6 @@ SECURE_CONTENT_TYPE_NOSNIFF = env.bool(
     "DJANGO_SECURE_CONTENT_TYPE_NOSNIFF", default=True
 )
 
-SENTRY_LOG_LEVEL = env.int("DJANGO_SENTRY_LOG_LEVEL", logging.ERROR)
-sentry_logging = LoggingIntegration(
-    level=SENTRY_LOG_LEVEL,  # Capture info and above as breadcrumbs
-    event_level=logging.ERROR,  # Send errors as events
-)
-sentry_sdk.init(
-    dsn=SENTRY_DSN, 
-    integrations=[sentry_logging, DjangoIntegration()],
-    send_default_pii=True
-)
-
-ENABLE_APM = env.bool("ENABLE_APM", default=True)
-if ENABLE_APM:
-    ELASTIC_APM_IP = env.str("ELASTIC_APM_IP", default="")
-    INSTALLED_APPS.append("elasticapm.contrib.django")
-    MIDDLEWARE.insert(0, "elasticapm.contrib.django.middleware.TracingMiddleware")
-    ELASTIC_APM = {
-        "SERVICE_NAME": PROJECT_NAME,
-        "SERVER_URL": ELASTIC_APM_IP,
-        "DJANGO_TRANSACTION_NAME_FROM_ROUTE": True,
-    }
 
 
 

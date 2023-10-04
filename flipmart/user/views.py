@@ -2,13 +2,7 @@ from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect, render
 from django.views.generic import CreateView
 from rest_framework import status
-
 from user.forms import Registration
-
-
-class IndexView:
-    pass
-
 
 class UserLoginView(LoginView):
     template_name = "login.html"

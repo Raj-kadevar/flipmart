@@ -159,9 +159,6 @@ TEMPLATES = [
 ]
 
 MIDDLEWARE = [
-    
-
-    
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -170,10 +167,6 @@ MIDDLEWARE = [
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-
-    
-    
-
 ]
 
 ROOT_URLCONF = "flipmart.urls"
@@ -198,7 +191,7 @@ INSTALLED_APPS = [
 ]
 
 AUTH_USER_MODEL = "user.User"
-LOGIN_REDIRECT_URL = "registration"
+LOGIN_REDIRECT_URL = "index"
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -215,11 +208,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# A sample logging configuration. The only tangible logging
-# performed by this configuration is to send an email to
-# the site admins on every HTTP 500 error when DEBUG=False.
-# See http://docs.djangoproject.com/en/dev/topics/logging for
-# more details on how to customize your logging configuration.
 
 LOCALE_PATHS = (normpath(join(PROJECT_ROOT, "locale")),)
 
@@ -237,8 +225,6 @@ LANGUAGES = [
 
 
 
-# Analytics
-GOOGLE_ANALYTICS = env.str("GOOGLE_ANALYTICS", default="")
 
 CACHE_ENGINES = {
     
@@ -262,4 +248,3 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 10
 }
 
-SENTRY_DSN = env.str("SENTRY_DSN", "")
