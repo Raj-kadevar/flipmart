@@ -216,7 +216,6 @@ gettext = lambda s: s
 
 LANGUAGES = [
     ("en", gettext("en")),
-    
 ]
 
 

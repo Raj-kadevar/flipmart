@@ -12,6 +12,9 @@ class Category(models.Model):
     image = models.ImageField(upload_to="Categories/")
     description = models.CharField(max_length=200, blank=True)
 
+    def __str__(self):
+        return self.name
+
 
 class Product(models.Model):
     name = models.CharField(blank=False, max_length=30)
