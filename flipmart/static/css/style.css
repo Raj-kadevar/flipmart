@@ -9,3 +9,10 @@
 body{
   background-color: #F7F7F7;
 }
+p{
+    color:#0069d9;
+    font-size:15px;
+}
+.box{
+    padding:15%;
+}

@@ -1,9 +1,11 @@
 from django.urls import path
-from django.views.generic import TemplateView
-from user.views import RegistrationView, UserLoginView
+from user.views import RegistrationView, UserLoginView, IndexView, AddProduct, AddCategory
 
 urlpatterns = [
-    path("", TemplateView.as_view(template_name = 'index.html'), name="index"),
+    path("", IndexView.as_view(), name="index"),
     path("login/", UserLoginView.as_view(), name="login"),
     path("registration/", RegistrationView.as_view(), name="registration"),
+    path("add-product/", AddProduct.as_view(), name="add_product"),
+    path("add-category/", AddCategory.as_view(), name="add_category"),
+    path("product/<int:id>", AddCategory.as_view(), name="product"),
 ]

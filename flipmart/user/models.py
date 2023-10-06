@@ -2,7 +2,10 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import ImageField
 
-
+# class CommonField(models.Model):
+#
+#     class Meta:
+#         abstract = True
 class User(AbstractUser):
     profile = ImageField(blank=True, null=True, upload_to="profile/")
 
@@ -22,7 +25,7 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2, null=False, blank=False)
     about = models.CharField(max_length=200, blank=True)
     type = models.ForeignKey(Category, on_delete=models.CASCADE)
-
+    owner = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
 
 class Cart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -42,3 +45,11 @@ class OrderDetail(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(blank=False, null=False)
     price = models.DecimalField(max_digits=10, decimal_places=2, null=False, blank=False)
+
+class CustomPermissions(models.Model):
+
+    class Meta:
+        managed = False
+        default_permissions = ()
+
+        permissions = (('admin_access', 'can use admin panel'),)
