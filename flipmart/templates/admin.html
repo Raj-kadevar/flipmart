@@ -147,10 +147,10 @@
                         <td class="t-op-nextlvl">{{category.name}}</td>
                         <td class="t-op-nextlvl">{{category.image}}</td>
                         <td class="t-op-nextlvl">{{category.description}}</td>
-                        <td><a href="#">
+                        <td><a href="{% url 'update_category' category.id%}">
                             <button class="btn btn-primary">Update</button>
                         </a></td>
-                        <td><a href="#">
+                        <td><a href="{% url 'delete_category' category.id%}">
                             <button class="btn btn-danger">Delete</button>
                         </a></td>
                     </tr>

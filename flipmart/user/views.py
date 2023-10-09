@@ -3,11 +3,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect, render
 from django.views import View
-from django.views.generic import CreateView, ListView, UpdateView
+from django.views.generic import CreateView, ListView, UpdateView, DeleteView
 from rest_framework import status
 from user.models import Category
 from user.forms import Registration, ProductForm, CategoryForm
 from django.urls import reverse_lazy
+
+from flipmart.user.models import Product
 
 
 class UserLoginView(LoginView):
@@ -50,7 +52,7 @@ class AddProduct(CreateView):
             product_data = product.save()
             product_data.owner = request.user
             product_data.save()
-            return redirect('index')
+            return redirect('add_product')
         else:
             errors = product.errors
             return render(request, "product_form.html", {"errors": errors, "form": product}, status=status.HTTP_400_BAD_REQUEST)
@@ -63,7 +65,7 @@ class AddCategory(CreateView):
         category = CategoryForm(request.POST, request.FILES)
         if category.is_valid():
             category.save()
-            return redirect('index')
+            return redirect('add_category')
         else:
             errors = category.errors
             return render(request, "product_form.html", {"errors": errors, "form": category}, status=status.HTTP_400_BAD_REQUEST)
@@ -71,9 +73,30 @@ class AddCategory(CreateView):
 class UpdateCategory(LoginRequiredMixin, UpdateView):
 
     form_class = CategoryForm
-    template_name = "index.html"
+    template_name = "category_form.html"
     success_url = reverse_lazy("index")
-    queryset = Book.objects.all()
+    queryset = Category.objects.all()
+
+
+class DeleteCategory(DeleteView):
+    model = Category
+    template_name = "conform_delete.html"
+    success_url = "index"
+
+
+class DeleteProduct(DeleteView):
+    model = Product
+    template_name = "conform_delete.html"
+    success_url = "index"
+
+
+class UpdateProduct(LoginRequiredMixin, UpdateView):
+
+    form_class = ProductForm
+    template_name = "product_form.html"
+    success_url = reverse_lazy("index")
+    queryset = Category.objects.all()
+
 
 class IndexView(LoginRequiredMixin, View):
 
