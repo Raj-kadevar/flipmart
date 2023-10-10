@@ -83,7 +83,6 @@
                          class="nav-img"
                          alt="articles">
                     <a href="{% url 'index' %}"><h4> Category</h4></a>
-
                 </div>
 
                 <div class="nav-option option3">
@@ -128,39 +127,40 @@
 
         <div class="report-container">
             <div class="report-header">
-                <h1 class="recent-Articles">Category</h1>
-                {% if perms.user.add_category %}
-                <a href="{% url 'add_category' %}">
+                <h1 class="recent-Articles">product</h1>
+                {% if perms.user.add_product %}
+                <a href="{% url 'add_product' %}">
                     <button class="view">Add</button>
                 </a>
                 {% endif %}
             </div>
-            {% if perms.user.view_category %}
+            {% if perms.user.view_product %}
             <div class="report-body">
                 <table>
                     <tr>
-                        <th class="t-op">Category</th>
+                        <th class="t-op">product</th>
                         <th class="t-op">Img_Url</th>
-                        <th class="t-op">Description</th>
-                        {% if 'user.change_category' in perms %}
+                        <th class="t-op">type</th>
+                        {% if 'user.change_product' in perms %}
                         <th class="t-op">Update</th>
                         {% endif %}
-                        {% if perms.user.change_category %}
+                        {% if perms.user.change_product %}
                         <th class="t-op">Delete</th>
                         {% endif %}
                     </tr>
-                    {% for category in categories %}
+                    {% for product in products %}
                     <tr>
-                        <td class="t-op-nextlvl">{{category.name}}</td>
-                        <td class="t-op-nextlvl">{{category.image}}</td>
-                        <td class="t-op-nextlvl">{{category.description}}</td>
-                        {% if 'user.change_category' in perms %}
-                        <td><a href="{% url 'update_category' category.id%}">
+                        <td class="t-op-nextlvl">{{product.name}}</td>
+                        <td class="t-op-nextlvl">{{product.image}}</td>
+                        <td class="t-op-nextlvl">{{product.type}}</td>
+                        <td class="t-op-nextlvl">{{product.about}}</td>
+                        {% if 'user.change_product' in perms %}
+                        <td><a href="{% url 'update_product' product.id%}">
                             <button class="btn btn-primary">Update</button>
                         </a></td>
                         {% endif %}
-                        {% if perms.user.change_category %}
-                        <td><a href="{% url 'delete_category' category.id%}">
+                        {% if perms.user.change_product %}
+                        <td><a href="{% url 'delete_product' product.id%}">
                             <button class="btn btn-danger">Delete</button>
                         </a></td>
                         {% endif %}
@@ -169,7 +169,7 @@
                 </table>
             </div>
             {% else %}
-            <h4> You can't see category !</h4>
+            <h4> You can't see product !</h4>
             {% endif%}
         </div>
     </div>

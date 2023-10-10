@@ -2,10 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import ImageField
 
-# class CommonField(models.Model):
-#
-#     class Meta:
-#         abstract = True
+
 class User(AbstractUser):
     profile = ImageField(blank=True, null=True, upload_to="profile/")
 

@@ -1,5 +1,6 @@
 from django.contrib.auth.forms import UserCreationForm, get_user_model
 from django import forms
+from django.contrib.auth.models import Group
 
 from user.models import Product, Category
 
@@ -7,9 +8,11 @@ User = get_user_model()
 
 
 class Registration(UserCreationForm):
+    groups = [(name, name) for name in Group.objects.all().values_list('name', flat=True)]
+    roles = forms.ChoiceField(choices= groups)
     class Meta:
         model = User
-        fields = ['username', 'password1', 'password2']
+        fields = ['username', 'password1', 'password2', 'roles']
 
 
 class ProductForm(forms.ModelForm):

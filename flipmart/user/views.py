@@ -1,15 +1,17 @@
+from math import perm
+
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.models import Group
 from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect, render
 from django.views import View
-from django.views.generic import CreateView, ListView, UpdateView, DeleteView
+from django.views.generic import CreateView, UpdateView, DeleteView, ListView
 from rest_framework import status
 from user.models import Category
 from user.forms import Registration, ProductForm, CategoryForm
 from django.urls import reverse_lazy
-
-from flipmart.user.models import Product
+from user.models import Product
 
 
 class UserLoginView(LoginView):
@@ -31,10 +33,10 @@ class RegistrationView(CreateView):
     template_name = "form.html"
 
     def post(self, request, *args, **kwargs):
-
         user = Registration(request.POST)
         if user.is_valid():
-            user.save()
+            user = user.save()
+            user.groups.add(Group.objects.get(name=request.POST['roles']))
             messages.success(request, 'form submitted successfully.')
             return redirect('login')
         else:
@@ -52,6 +54,7 @@ class AddProduct(CreateView):
             product_data = product.save()
             product_data.owner = request.user
             product_data.save()
+            messages.success(request, 'product added successfully.')
             return redirect('add_product')
         else:
             errors = product.errors
@@ -65,33 +68,38 @@ class AddCategory(CreateView):
         category = CategoryForm(request.POST, request.FILES)
         if category.is_valid():
             category.save()
+            messages.success(request, 'category added successfully.')
             return redirect('add_category')
         else:
             errors = category.errors
             return render(request, "product_form.html", {"errors": errors, "form": category}, status=status.HTTP_400_BAD_REQUEST)
 
-class UpdateCategory(LoginRequiredMixin, UpdateView):
-
+class UpdateCategory(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    permission_required = ('user.change_category',)
     form_class = CategoryForm
     template_name = "category_form.html"
     success_url = reverse_lazy("index")
     queryset = Category.objects.all()
 
 
-class DeleteCategory(DeleteView):
+
+
+class DeleteCategory(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+    permission_required = ('user.delete_category',)
     model = Category
-    template_name = "conform_delete.html"
-    success_url = "index"
+    template_name = "confirm_delete.html"
+    success_url = reverse_lazy("index")
 
 
-class DeleteProduct(DeleteView):
+class DeleteProduct(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+    permission_required = ('user.delete_product',)
     model = Product
-    template_name = "conform_delete.html"
-    success_url = "index"
+    template_name = "confirm_delete.html"
+    success_url = reverse_lazy("index")
 
 
-class UpdateProduct(LoginRequiredMixin, UpdateView):
-
+class UpdateProduct(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    permission_required = ('user.change_product',)
     form_class = ProductForm
     template_name = "product_form.html"
     success_url = reverse_lazy("index")
@@ -101,9 +109,28 @@ class UpdateProduct(LoginRequiredMixin, UpdateView):
 class IndexView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
-        if request.user.has_perm('user.admin_access'):
-            categories = Category.objects.all()
-            return render(request, "admin.html",{"categories":categories})
+        if request.user.has_perm("user.admin_access"):
+            if request.user.has_perm("user.view_category"):
+                categories = Category.objects.all()
+                return render(request, "admin.html",{"categories":categories})
+            return render(request, "admin.html")
         else:
             categories = Category.objects.all()
             return render(request,"index.html",{"categories":categories})
+
+
+class ProductList(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    permission_required = ('user.view_product',)
+    template_name = "admin_product.html"
+    context_object_name = "products"
+
+    def get_queryset(self):
+        return Product.objects.filter(owner = self.request.user)
+
+
+class ProductListView(LoginRequiredMixin, ListView):
+    template_name = "product.html"
+    context_object_name = "products"
+
+    def get_queryset(self):
+        return Product.objects.filter(type = self.kwargs['pk'])
