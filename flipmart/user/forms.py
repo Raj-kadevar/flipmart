@@ -26,13 +26,6 @@ class ProductForm(forms.ModelForm):
             raise forms.ValidationError("price should be more then 50.")
         return price
 
-    def clean_name(self):
-        name = self.cleaned_data.get('name')
-
-        if not name:
-            raise forms.ValidationError("Name cannot be empty.")
-        return name
-
     def clean_image(self):
 
         image = self.cleaned_data.get('image')
@@ -59,13 +52,6 @@ class CategoryForm(forms.ModelForm):
     class Meta:
         model = Category
         fields = ['name', 'image', 'description']
-
-    def clean_name(self):
-        name = self.cleaned_data.get('name')
-
-        if not name:
-            raise forms.ValidationError("Name cannot be empty.")
-        return name
 
     def clean_image(self):
 
