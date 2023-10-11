@@ -8,13 +8,13 @@ from django.shortcuts import redirect, render
 from django.views import View
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView
 from rest_framework import status
-from user.models import Category
+from user.models import Category, Cart
 from user.forms import Registration, ProductForm, CategoryForm
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from user.models import Product
 
 
-class UserLoginView(LoginView):
+class  UserLoginView(LoginView):
     template_name = "login.html"
 
 
@@ -37,7 +37,7 @@ class RegistrationView(CreateView):
         if user.is_valid():
             user = user.save()
             user.groups.add(Group.objects.get(name=request.POST['roles']))
-            messages.success(request, 'form submitted successfully.')
+            messages.success(request, 'registration successful.')
             return redirect('login')
         else:
             errors = user.errors
@@ -60,10 +60,10 @@ class AddProduct(CreateView):
             errors = product.errors
             return render(request, "product_form.html", {"errors": errors, "form": product}, status=status.HTTP_400_BAD_REQUEST)
 
-class AddCategory(CreateView):
+class AddCategory(PermissionRequiredMixin, CreateView):
     form_class = CategoryForm
     template_name = "category_form.html"
-
+    permission_required = ('user.add_category',)
     def post(self, request, *args, **kwargs):
         category = CategoryForm(request.POST, request.FILES)
         if category.is_valid():
@@ -113,13 +113,16 @@ class IndexView(LoginRequiredMixin, View):
             if request.user.has_perm("user.view_category"):
                 categories = Category.objects.all()
                 return render(request, "admin.html",{"categories":categories})
+            elif request.user.has_perm("user.view_category"):
+                products = Product.objects.filter(owner = self.request.user)
+                return render(request, "admin_product.html",{"products":products})
             return render(request, "admin.html")
         else:
             categories = Category.objects.all()
             return render(request,"index.html",{"categories":categories})
 
 
-class ProductList(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+class AdminProductList(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     permission_required = ('user.view_product',)
     template_name = "admin_product.html"
     context_object_name = "products"
@@ -128,9 +131,63 @@ class ProductList(LoginRequiredMixin, PermissionRequiredMixin, ListView):
         return Product.objects.filter(owner = self.request.user)
 
 
-class ProductListView(LoginRequiredMixin, ListView):
+class ProductList(LoginRequiredMixin, ListView):
     template_name = "product.html"
     context_object_name = "products"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['carts'] = (Cart.objects.filter(user=self.request.user).values_list('product__id', flat=True))
+        return context
     def get_queryset(self):
-        return Product.objects.filter(type = self.kwargs['pk'])
+        products = Product.objects.filter(type = self.kwargs['pk'])
+        return products
+
+
+class AddToCart(LoginRequiredMixin, View):
+
+    def get(self, request, *args, **kwargs):
+        messages.success(request, 'product added successfully.')
+        product = Product.objects.get(id = kwargs['id'])
+        category_id = product.type.id
+        cart = Cart.objects.filter(product=product, user=request.user).first()
+        if cart:
+            quantity = cart.quantity
+            cart.quantity = quantity+1
+            cart.save()
+        else:
+            Cart.objects.create(user=request.user, product=product, quantity=1)
+        return redirect(reverse("category", kwargs = {'pk':category_id}))
+
+
+class ManageQuantity(LoginRequiredMixin, View):
+
+    def get(self, request, *args, **kwargs):
+        product = Product.objects.get(id = kwargs['id'])
+        category_id = product.type.id
+        cart = Cart.objects.filter(product=product, user=request.user).first()
+        if cart:
+            quantity = cart.quantity
+            if quantity > 1 :
+                cart.quantity = quantity-1
+                cart.save()
+                messages.success(request, 'product remove successfully.')
+            else:
+                cart.delete()
+                messages.success(request, 'item removed successfully.')
+
+        return redirect(reverse("category", kwargs = {'pk':category_id}))
+
+
+class CartList(LoginRequiredMixin, ListView):
+    template_name = "cart.html"
+    context_object_name = "carts"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['user_carts'] = (Cart.objects.filter(user=self.request.user).values_list('product__id', flat=True))
+        return context
+    def get_queryset(self):
+        carts = Cart.objects.all()
+        return carts
+

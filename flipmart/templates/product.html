@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-{% load static %}
+{% load static custom_tags %}
 <html lang="en">
 <head>
     <meta charset="UTF-8"/>
@@ -39,7 +39,7 @@
             <div class="row gy-3">
 
                 <div class="col-md-3">
-                    <h3>FlipMart</h3>
+                    <a href="{% url 'index' %}"><h3>FlipMart</h3></a>
                 </div>
 
                 <div class="col-md-6 ">
@@ -66,10 +66,16 @@
                                     class="fas fa-user-alt m-1 me-md-2"></i>
                         </a>
 
-                        <a href="https://github.com/mdbootstrap/bootstrap-material-design"
+                        <a href="{% url 'cart' %}"
                            class="border rounded py-1 px-3 nav-link d-flex align-items-center" target="_blank">
                             <i class="fas fa-shopping-cart m-1 me-md-2"></i>
                         </a>
+
+                        <a href="{% url 'logout' %}"
+                           class="border rounded py-1 px-1 nav-link d-flex align-items-center" target="_blank">
+                            <i class="far fa-times-circle m-1 me-md-1"></i>
+                        </a>
+
                     </div>
                 </div>
             </div>
@@ -100,11 +106,11 @@
             <div class="carousel-inner">
                 {% for product in products %}
                 {% if forloop.first %}
-                <div class="carousel-item active" data-bs-interval="2000">
+                <div class="carousel-item active" data-bs-interval="5000">
                     <img src="{{product.image.url}}" style="height: 400px" class="d-block w-100">
                 </div>
                 {% else %}
-                <div class="carousel-item" data-bs-interval="2000">
+                <div class="carousel-item" data-bs-interval="5000">
                     <img src="{{product.image.url}}" style="height: 400px" class="d-block w-100">
                 </div>
                 {% endif %}
@@ -129,7 +135,7 @@
                 {% for product in products %}
                 <div class="col-lg-3 col-md-4 col-sm-6">
                     <div class="card my-2 shadow-0 box">
-                        <a href="{% url 'category' product.id%}">
+                        <a href="#">
                             <img src="{{product.image.url}}"
                                  class="card-img-top" style="aspect-ratio: 1 / 1">
                         </a>
@@ -142,6 +148,43 @@
                         <div class="card-body p-0 pt-3">
                             <p class="card-text mb-0">{{product.about}}</p>
                         </div>
+                        </br>
+                        {% if product.id in carts %}
+                        {% with user_cart_quantity.request.user.product as quantity %}
+                        {% if quantity <= 1 %}
+
+                        <a>
+                            <button disabled class="align-items-center btn btn-danger" target="_blank">
+                                <i class=" fas fas fa-minus m-1 me-md-1"></i>
+                            </button>
+                        </a>
+                        {% else %}
+                        <a href="{% url 'manage_quantity' product.id %}">
+                            <button class="align-items-center btn btn-danger" target="_blank">
+                                <i class=" fas fas fa-minus m-1 me-md-1"></i>
+                            </button>
+                        </a>
+                        {% endif %}
+                        {% endwith %}
+
+                        <h4>&nbsp; {% user_cart_quantity request.user product %}</h4>
+                        <a href="{% url 'add_to_cart' product.id %}">
+                            <button class="align-items-center btn btn-primary" target="_blank">
+                                <i class=" fas fa-plus m-1 me-md-1"></i>
+                            </button>
+                        </a></br>
+                        {% else %}
+                        <a href="{% url 'add_to_cart' product.id %}">
+                            <button class="align-items-center btn btn-primary" target="_blank">
+                                <i class="fas fa-shopping-cart m-1 me-md-2"></i>
+                            </button>
+                        </a></br>
+                        {% endif %}
+                        <a href="{% url 'add_to_cart' product.id %}">
+                            <button class="align-items-center btn btn-primary" target="_blank">
+                                buy-now!
+                            </button>
+                        </a>
                     </div>
                 </div>
                 {% endfor %}
@@ -149,7 +192,6 @@
             </div>
         </div>
     </div>
-    </header>
     </div>
 </section>
 
@@ -295,5 +337,6 @@
     </div>
 </footer>
 </body>
+<script src="{% static 'js/script.js' %}"></script>
 </html>
 

@@ -77,14 +77,14 @@
     <div class="navcontainer">
         <nav class="nav">
             <div class="nav-upper-options">
-
+                {% if perms.user.view_category %}
                 <div class="option2 nav-option">
                     <img src="https://media.geeksforgeeks.org/wp-content/uploads/20221210183322/9.png"
                          class="nav-img"
                          alt="articles">
                     <a href="{% url 'index' %}"><h4> Category</h4></a>
-
                 </div>
+                {% endif %}
 
                 <div class="nav-option option3">
                     <img src="https://media.geeksforgeeks.org/wp-content/uploads/20221210183320/5.png"

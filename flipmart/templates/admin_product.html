@@ -77,14 +77,14 @@
     <div class="navcontainer">
         <nav class="nav">
             <div class="nav-upper-options">
-
+            {% if perms.user.view_category %}
                 <div class="option2 nav-option">
                     <img src="https://media.geeksforgeeks.org/wp-content/uploads/20221210183322/9.png"
                          class="nav-img"
                          alt="articles">
                     <a href="{% url 'index' %}"><h4> Category</h4></a>
                 </div>
-
+            {% endif %}
                 <div class="nav-option option3">
                     <img src="https://media.geeksforgeeks.org/wp-content/uploads/20221210183320/5.png"
                          class="nav-img"
@@ -124,7 +124,7 @@
                      alt="search-button">
             </div>
         </div>
-
+        {% if perms.user.view_product %}
         <div class="report-container">
             <div class="report-header">
                 <h1 class="recent-Articles">product</h1>
@@ -134,7 +134,7 @@
                 </a>
                 {% endif %}
             </div>
-            {% if perms.user.view_product %}
+            {% if perms.user.view_product and products %}
             <div class="report-body">
                 <table>
                     <tr>
@@ -169,9 +169,10 @@
                 </table>
             </div>
             {% else %}
-            <h4> You can't see product !</h4>
+            <h4> You have 0 product !</h4>
             {% endif%}
         </div>
+        {% endif %}
     </div>
 </div>
 </body>
