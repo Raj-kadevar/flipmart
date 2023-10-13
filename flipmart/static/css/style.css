@@ -16,3 +16,12 @@ p{
 .box{
     padding:15%;
 }
+.product{
+    width:95%;
+    margin:auto;
+}
+.view_all{
+    margin-left:430px;
+    margin-top:10px;
+    font-size:23px;
+}

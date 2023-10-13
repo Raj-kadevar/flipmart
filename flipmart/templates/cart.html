@@ -66,11 +66,6 @@
                                     class="fas fa-user-alt m-1 me-md-2"></i>
                         </a>
 
-                        <a href="https://github.com/mdbootstrap/bootstrap-material-design"
-                           class="border rounded py-1 px-3 nav-link d-flex align-items-center" target="_blank">
-                            <i class="fas fa-shopping-cart m-1 me-md-2"></i>
-                        </a>
-
                         <a href="{% url 'logout' %}"
                            class="border rounded py-1 px-1 nav-link d-flex align-items-center" target="_blank">
                             <i class="far fa-times-circle m-1 me-md-1"></i>
@@ -100,41 +95,29 @@
                 <div class="col-lg-3 col-md-4 col-sm-6">
                     <div class="card my-2 shadow-0 box">
                         <a href="#">
-                            <img src="{% cart.product_set.all.image.url %}"
+                            <img src="{{ cart.product.image.url }}"
                                  class="card-img-top" style="aspect-ratio: 1 / 1">
                         </a>
                         <div class="card-body p-0 pt-3 ms-2">
-                            <p class="card-text mb-0 ">{{cart.name}}</p>
+                            <p class="card-text mb-0 ">{{cart.product.name}}</p>
                         </div>
                         </br>
-                        {% if cart.id in user_carts %}
-                        <a href="{% url 'manage_quantity' cart.id %}">
+                        <p>Quantity:&nbsp; {% user_cart_quantity request.user cart.product %}</p>
+                        <a href="{% url 'remove_cart' cart.id %}">
                             <button class="align-items-center btn btn-danger" target="_blank">
-                                <i class=" fas fas fa-minus m-1 me-md-1"></i>
-                            </button>
-                        </a>
-                        <h4>&nbsp; {% user_cart_quantity request.user cart %}</h4>
-                        <a href="{% url 'add_to_cart' cart.id %}">
-                            <button class="align-items-center btn btn-primary" target="_blank">
-                                <i class=" fas fa-plus m-1 me-md-1"></i>
-                            </button>
-                        </a></br>
-                        {% else %}
-                        {% endif %}
-                        <a href="{% url 'add_to_cart' cart.id %}">
-                            <button class="align-items-center btn btn-primary" target="_blank">
-                                buy-now!
-                            </button>
-                        </a></br>
-                        <a href="{% url 'add_to_cart' cart.id %}">
-                            <button class="align-items-center btn btn-danger" target="_blank">
-                                remove!
+                                remove :(
                             </button>
                         </a>
                     </div>
                 </div>
                 {% endfor %}
-
+                {% if carts %}
+                <a href="{% url 'order' %}">
+                    <button class="align-items-center btn btn-primary" target="_blank">
+                        <h4>buy-now :)</h4>
+                    </button>
+                </a>
+                {% endif %}
             </div>
         </div>
     </div>

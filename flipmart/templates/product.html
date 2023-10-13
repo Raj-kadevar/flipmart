@@ -150,23 +150,11 @@
                         </div>
                         </br>
                         {% if product.id in carts %}
-                        {% with user_cart_quantity.request.user.product as quantity %}
-                        {% if quantity <= 1 %}
-
-                        <a>
-                            <button disabled class="align-items-center btn btn-danger" target="_blank">
-                                <i class=" fas fas fa-minus m-1 me-md-1"></i>
-                            </button>
-                        </a>
-                        {% else %}
                         <a href="{% url 'manage_quantity' product.id %}">
                             <button class="align-items-center btn btn-danger" target="_blank">
                                 <i class=" fas fas fa-minus m-1 me-md-1"></i>
                             </button>
                         </a>
-                        {% endif %}
-                        {% endwith %}
-
                         <h4>&nbsp; {% user_cart_quantity request.user product %}</h4>
                         <a href="{% url 'add_to_cart' product.id %}">
                             <button class="align-items-center btn btn-primary" target="_blank">
@@ -180,9 +168,9 @@
                             </button>
                         </a></br>
                         {% endif %}
-                        <a href="{% url 'add_to_cart' product.id %}">
+                        <a href="{% url 'order' product.id %}">
                             <button class="align-items-center btn btn-primary" target="_blank">
-                                buy-now!
+                                buy-now:)
                             </button>
                         </a>
                     </div>

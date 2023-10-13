@@ -18,18 +18,19 @@
                     <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#user"></use>
                 </svg>
             username: {{ form.username }}
-            <h4 class="text-danger">{{ form.errors.username }}</h4>
-        </div>
 
+        </div>
+        <h4 class="text-danger">{{ form.errors.username }}</h4>
         <div class="form__field">
                 <svg class="icon">
                     <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#lock"></use>
                 </svg>
 
             password: {{ form.password1 }}</br></br>
-            <h4 class="text-danger">{{ form.errors.password1 }}</h4>
 
         </div>
+        <h4 class="text-danger">{{ form.errors.password1 }}</h4>
+
         <div class="form__field">
 
             <svg class="icon">
@@ -37,15 +38,13 @@
             </svg>
 
             confirm_password: {{ form.password2 }}</br></br>
-            <h4 class="text-danger">{{ form.errors.password2 }}</h4>
-
         </div>
+        <h4 class="text-danger">{{ form.errors.password2 }}</h4>
+
         <div class="form__field">
-
             Select-Role: {{ form.roles }}</br></br>
-            <h4 class="text-danger">{{ form.errors.roles }}</h4>
-
         </div>
+        <h4 class="text-danger">{{ form.errors.roles }}</h4>
         <div class="form__field">
             <input type="submit" value="Submit">
         </div>

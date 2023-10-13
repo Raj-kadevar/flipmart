@@ -2,7 +2,7 @@ from django.contrib.auth.forms import UserCreationForm, get_user_model
 from django import forms
 from django.contrib.auth.models import Group
 
-from user.models import Product, Category
+from user.models import Product, Category, Address
 
 User = get_user_model()
 
@@ -18,7 +18,7 @@ class Registration(UserCreationForm):
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
-        fields = ['name', 'image', 'price', 'about', 'type']
+        fields = ['name', 'image', 'price', 'about', 'type', 'stock']
 
     def clean_price(self):
         price = self.cleaned_data.get('price')
@@ -47,6 +47,13 @@ class ProductForm(forms.ModelForm):
             raise forms.ValidationError("type require.")
         return type
 
+    def clean_stock(self):
+        stock = self.cleaned_data.get('stock')
+        if stock < 1:
+            raise forms.ValidationError("stock should be more then 0")
+        return stock
+
+
 
 class CategoryForm(forms.ModelForm):
     class Meta:
@@ -67,3 +74,10 @@ class CategoryForm(forms.ModelForm):
         if not description:
             raise forms.ValidationError("description require.")
         return description
+
+
+class AddressForm(forms.ModelForm):
+
+    class Meta:
+        model = Address
+        fields = ['street1', 'street2', 'address']

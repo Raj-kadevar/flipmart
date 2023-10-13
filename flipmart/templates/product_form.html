@@ -31,34 +31,43 @@
         <div class="form__field">
 
             Product_name: {{ form.name }}
-            {{ form.errors.name }}
         </div>
+        {{ form.errors.name }}
 
         <div class="form__field">
 
             Product_Image: {{ form.image }}</br></br>
-            {{ form.errors.image }}
 
         </div>
+        {{ form.errors.image }}
+
         <div class="form__field">
 
             Product_price: {{ form.price }}</br></br>
-            {{ form.errors.price }}
 
         </div>
+        {{ form.errors.price }}
+
         <div class="form__field">
 
             Product_about: {{ form.about }}</br></br>
-            {{ form.errors.about }}
 
         </div>
+        {{ form.errors.about }}
+
         <div class="form__field">
 
             Product_type: {{ form.type }}</br></br>
-            {{ form.errors.type }}
 
         </div>
+        {{ form.errors.type }}
 
+        <div class="form__field">
+
+            Product_type: {{ form.stock }}</br></br>
+
+        </div>
+        {{ form.errors.stock }}
         <div class="form__field">
             <input type="submit" value="Submit">
         </div>

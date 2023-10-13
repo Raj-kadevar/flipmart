@@ -61,7 +61,7 @@
                                 class="fas fa-user-alt m-1 me-md-2"></i>
                         </a>
 
-                        <a href="https://github.com/mdbootstrap/bootstrap-material-design"
+                        <a href="{% url 'cart' %}"
                            class="border rounded py-1 px-3 nav-link d-flex align-items-center" target="_blank">
                             <i class="fas fa-shopping-cart m-1 me-md-2"></i>
                         </a>
@@ -78,7 +78,44 @@
 </header>
 
 <!--  intro  -->
+<div class="container my-5"></br>
+    <header class="mb-4">
+        <h4>Products</h4>
+    </header>
+</div>
+<div class="row product">
+    {% for product in products %}
+    <div class="col-lg-3 col-md-4 col-sm-6">
+        <div class="card my-2 shadow-0 box">
+            <a href="#">
+                <img src="{{product.image.url}}"
+                     class="card-img-top" style="aspect-ratio: 1 / 1">
+            </a>
+            <div class="card-body p-0 pt-3 ms-2">
+                <p class="card-text mb-0 ">{{product.name}}</p>
+            </div>
+            <div class="card-body p-0 pt-3 ms-2">
+                <p class="card-text mb-0 ">$:{{product.price}}</p>
+            </div>
+            <div class="card-body p-0 pt-3">
+                <p class="card-text mb-0">{{product.about}}</p>
+            </div>
+            </br>
+            <a href="{% url 'order' product.id %}">
+                <button class="align-items-center btn btn-primary" target="_blank">
+                    buy-now:)
+                </button>
+            </a>
+        </div>
+    </div>
+    {% endfor %}
 
+</div>
+<div class="view_all">
+    <a href="{% url 'all_products' %}">
+        View All
+    </a>
+</div>
 <!-- category -->
 <section>
     <div class="container my-5">

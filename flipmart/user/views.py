@@ -1,16 +1,15 @@
-from math import perm
-
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.models import Group
 from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect, render
+from django.urls import reverse_lazy, reverse
 from django.views import View
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView
 from rest_framework import status
-from user.models import Category, Cart
-from user.forms import Registration, ProductForm, CategoryForm
-from django.urls import reverse_lazy, reverse
+
+from user.forms import Registration, ProductForm, CategoryForm, AddressForm
+from user.models import Category, Cart, Address, OrderDetail as Order
 from user.models import Product
 
 
@@ -113,13 +112,14 @@ class IndexView(LoginRequiredMixin, View):
             if request.user.has_perm("user.view_category"):
                 categories = Category.objects.all()
                 return render(request, "admin.html",{"categories":categories})
-            elif request.user.has_perm("user.view_category"):
+            elif request.user.has_perm("user.view_product"):
                 products = Product.objects.filter(owner = self.request.user)
                 return render(request, "admin_product.html",{"products":products})
             return render(request, "admin.html")
         else:
+            products = Product.objects.all()[0:4]
             categories = Category.objects.all()
-            return render(request,"index.html",{"categories":categories})
+            return render(request, "index.html", {"categories": categories, "products": products})
 
 
 class AdminProductList(LoginRequiredMixin, PermissionRequiredMixin, ListView):
@@ -147,16 +147,19 @@ class ProductList(LoginRequiredMixin, ListView):
 class AddToCart(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
-        messages.success(request, 'product added successfully.')
         product = Product.objects.get(id = kwargs['id'])
         category_id = product.type.id
         cart = Cart.objects.filter(product=product, user=request.user).first()
         if cart:
             quantity = cart.quantity
             cart.quantity = quantity+1
+            messages.success(request, 'quantity +1 successfully.')
             cart.save()
         else:
-            Cart.objects.create(user=request.user, product=product, quantity=1)
+            messages.success(request, 'product added successfully.')
+            Cart.objects.get_or_create(user=request.user, product=product, quantity=1)
+        if request.GET.get('result'):
+            return redirect(reverse("order", kwargs = {'pk':kwargs.get('id')}))
         return redirect(reverse("category", kwargs = {'pk':category_id}))
 
 
@@ -169,13 +172,17 @@ class ManageQuantity(LoginRequiredMixin, View):
         if cart:
             quantity = cart.quantity
             if quantity > 1 :
+                messages.success(request, 'quantity -1 successfully.')
                 cart.quantity = quantity-1
                 cart.save()
-                messages.success(request, 'product remove successfully.')
+            elif request.GET.get('result'):
+                messages.success(request, 'minimum one product required')
+                return redirect(reverse("order", kwargs={'pk': kwargs.get('id')}))
             else:
                 cart.delete()
                 messages.success(request, 'item removed successfully.')
-
+            if request.GET.get('result'):
+                return redirect(reverse("order", kwargs={'pk': kwargs.get('id')}))
         return redirect(reverse("category", kwargs = {'pk':category_id}))
 
 
@@ -188,6 +195,68 @@ class CartList(LoginRequiredMixin, ListView):
         context['user_carts'] = (Cart.objects.filter(user=self.request.user).values_list('product__id', flat=True))
         return context
     def get_queryset(self):
-        carts = Cart.objects.all()
+        carts = Cart.objects.filter(user=self.request.user)
         return carts
 
+
+class DeleteCart(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        Cart.objects.get(id=self.kwargs['id']).delete()
+        return redirect(reverse('cart'))
+
+
+class ListAllProducts(LoginRequiredMixin, ListView):
+    template_name = "all_products.html"
+    queryset = Product.objects.all()
+    context_object_name = "products"
+
+
+class OrderDetail(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        address = Address.objects.filter(user=request.user)
+        is_single_product = True
+        if address:
+            if kwargs.get('pk'):
+                product_details = Product.objects.filter(id=kwargs.get('pk')).first()
+                Cart.objects.get_or_create(user=request.user, product=product_details)
+                return render(request, "confirm_order.html",
+                              {"product": product_details, "is_single_product": is_single_product})
+            else:
+                product_details = Cart.objects.filter(user=request.user).values('product__id', 'product__name', 'product__price',
+                                                                'product__image', 'quantity')
+                return render(request, "confirm_order.html", {"products": product_details, "is_single_product": False})
+        else:
+            return redirect(reverse("set_address"))
+
+    def post(self, request, *args, **kwargs):
+        if kwargs.get('pk'):
+            product = Product.objects.get(id=kwargs.get('pk'))
+            Order.objects.create(user=request.user, product=product, quantity=1, price=product.price,
+                                 address=request.user.address_set.first())
+            messages.success(request, 'order placed successfully')
+            return redirect("index")
+        else:
+            carts = Cart.objects.filter(user=request.user)
+            Order.objects.create(user=request.user, address=request.user.address_set.first())
+
+            for cart in carts:
+                messages.success(request, 'orders placed successfully')
+            Cart.objects.filter(user=request.user).delete()
+            return redirect("index")
+
+
+class SetAddress(CreateView):
+    form_class = AddressForm
+    template_name = "address.html"
+
+    def post(self, request, *args, **kwargs):
+        address = AddressForm(request.POST)
+        if address.is_valid():
+            address = address.save(commit=False)
+            address.user = request.user
+            address.save()
+            messages.success(request, 'address set successfully')
+            return redirect('order')
+        else:
+            errors = address.errors
+            return render(request, "form.html", {"errors": errors, "form": address}, status=status.HTTP_400_BAD_REQUEST)
