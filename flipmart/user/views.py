@@ -158,8 +158,10 @@ class AddToCart(LoginRequiredMixin, View):
         else:
             messages.success(request, 'product added successfully.')
             Cart.objects.get_or_create(user=request.user, product=product, quantity=1)
-        if request.GET.get('result'):
-            return redirect(reverse("order", kwargs = {'pk':kwargs.get('id')}))
+        if request.GET.get('result') == 'True':
+            return redirect(reverse("order", kwargs={'pk': kwargs.get('id')}))
+        elif request.GET.get('result') == 'False':
+            return redirect(reverse("order"))
         return redirect(reverse("category", kwargs = {'pk':category_id}))
 
 
@@ -175,14 +177,19 @@ class ManageQuantity(LoginRequiredMixin, View):
                 messages.success(request, 'quantity -1 successfully.')
                 cart.quantity = quantity-1
                 cart.save()
-            elif request.GET.get('result'):
+                if request.GET.get('result') == 'True':
+                    return redirect(reverse("order", kwargs={'pk': kwargs.get('id')}))
+                elif request.GET.get('result') == 'False':
+                    return redirect(reverse("order"))
+            elif request.GET.get('result') == 'True':
                 messages.success(request, 'minimum one product required')
                 return redirect(reverse("order", kwargs={'pk': kwargs.get('id')}))
+            elif request.GET.get('result') == 'False':
+                messages.success(request, 'minimum one product required')
+                return redirect(reverse("order"))
             else:
                 cart.delete()
                 messages.success(request, 'item removed successfully.')
-            if request.GET.get('result'):
-                return redirect(reverse("order", kwargs={'pk': kwargs.get('id')}))
         return redirect(reverse("category", kwargs = {'pk':category_id}))
 
 

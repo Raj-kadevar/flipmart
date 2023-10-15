@@ -68,13 +68,13 @@
                                                          height="40%" width="40%"></br></td>
                 <td> $: {{ product.product__price}}</td>
                 <td>
-                    <a href="{% url 'manage_quantity' product.product__id %}?result=True">
+                    <a href="{% url 'manage_quantity' product.product__id %}?result=False">
                         <button class="align-items-center btn btn-warning" target="_blank">
                             <i class=" fas fas fa-minus m-1 me-md-1"></i>
                         </button>
                     </a>
                     <h4>&nbsp; {% user_cart_quantity request.user product.product__id %}</h4>
-                    <a href="{% url 'add_to_cart' product.product__id %}?result=True">
+                    <a href="{% url 'add_to_cart' product.product__id %}?result=False">
                         <button class="align-items-center btn btn-primary" target="_blank">
                             <i class=" fas fa-plus m-1 me-md-1"></i>
                         </button>
