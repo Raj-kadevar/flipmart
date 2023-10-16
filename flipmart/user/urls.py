@@ -1,8 +1,8 @@
 from django.contrib.auth.views import LogoutView
 from django.urls import path
 from user.views import RegistrationView, UserLoginView, IndexView, AddProduct, AddCategory, \
-    ProductList, AdminProductList, AddToCart, ManageQuantity, CartList, DeleteCart, ListAllProducts, OrderDetail, \
-    SetAddress
+    ProductList, AdminProductList, AddToCart, ManageQuantity, CartList, DeleteCart, ListAllProducts, OrderDetailView, \
+    SetAddress, ListAllOrder
 from user.views import UpdateCategory, UpdateProduct, DeleteCategory, DeleteProduct
 
 urlpatterns = [
@@ -30,7 +30,9 @@ urlpatterns = [
     path("remove-cart/<int:id>", DeleteCart.as_view(), name="remove_cart"),
 
     path("all-products/", ListAllProducts.as_view(), name="all_products"),
-    path("order/<int:pk>", OrderDetail.as_view(), name="order"),
-    path("order/", OrderDetail.as_view(), name="order"),
-    path("set-address/", SetAddress.as_view(), name="set_address"),
+    path("order/<int:pk>", OrderDetailView.as_view(), name="order"),
+    path("order/", OrderDetailView.as_view(), name="order"),
+    path("set-address/<int:pk>", SetAddress.as_view(), name="set_address"),
+
+    path("order-details/", ListAllOrder.as_view(), name="order_list"),
 ]

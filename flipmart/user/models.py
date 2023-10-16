@@ -40,13 +40,16 @@ class Address(models.Model):
     address = models.CharField(blank=False, null=False, max_length=100)
     user = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return self.address
+
 
 class Order(models.Model):
     user = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE)
     address = models.ForeignKey(Address, blank=True, null=True, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.user
+        return self.user.username
 
 class OrderDetail(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)

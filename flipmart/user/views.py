@@ -5,11 +5,10 @@ from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy, reverse
 from django.views import View
-from django.views.generic import CreateView, UpdateView, DeleteView, ListView
+from django.views.generic import CreateView, UpdateView, DeleteView, ListView, DetailView
 from rest_framework import status
-
 from user.forms import Registration, ProductForm, CategoryForm, AddressForm
-from user.models import Category, Cart, Address, OrderDetail as Order
+from user.models import Category, Cart, Address, OrderDetail, Order
 from user.models import Product
 
 
@@ -218,7 +217,7 @@ class ListAllProducts(LoginRequiredMixin, ListView):
     context_object_name = "products"
 
 
-class OrderDetail(LoginRequiredMixin, View):
+class OrderDetailView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         address = Address.objects.filter(user=request.user)
         is_single_product = True
@@ -233,23 +232,40 @@ class OrderDetail(LoginRequiredMixin, View):
                                                                 'product__image', 'quantity')
                 return render(request, "confirm_order.html", {"products": product_details, "is_single_product": False})
         else:
-            return redirect(reverse("set_address"))
+            return redirect(reverse("set_address", kwargs = {'pk': kwargs.get('pk')}))
 
     def post(self, request, *args, **kwargs):
         if kwargs.get('pk'):
             product = Product.objects.get(id=kwargs.get('pk'))
-            Order.objects.create(user=request.user, product=product, quantity=1, price=product.price,
-                                 address=request.user.address_set.first())
+            user = Order.objects.create(user=request.user, address=request.user.address_set.first())
+            cart = Cart.objects.filter(user=request.user, product=product).first()
+            total_price = cart.quantity * product.price
+            if product.stock > cart.quantity:
+                OrderDetail.objects.create(product=product, price=total_price, quantity=cart.quantity, order=user)
+                product.stock -= cart.quantity
+                product.save()
+            else:
+                messages.success(request, f"{product.name} is out of stock")
+                return redirect("index")
+            cart.delete()
             messages.success(request, 'order placed successfully')
-            return redirect("index")
+            return redirect("Order_list")
         else:
             carts = Cart.objects.filter(user=request.user)
-            Order.objects.create(user=request.user, address=request.user.address_set.first())
+            user = Order.objects.create(user=request.user, address=request.user.address_set.first())
 
             for cart in carts:
-                messages.success(request, 'orders placed successfully')
+                total_price = cart.quantity * cart.product.price
+                product = Product.objects.get(id=cart.product.id)
+                if product.stock > cart.quantity:
+                    OrderDetail.objects.create(product=cart.product, price=total_price, quantity=cart.quantity, order=user)
+                    product.stock -= cart.quantity
+                    product.save()
+                else:
+                    messages.success(request, f"{product.name} is out of stock")
             Cart.objects.filter(user=request.user).delete()
-            return redirect("index")
+            messages.success(request, 'order placed successfully')
+            return redirect("Order_list")
 
 
 class SetAddress(CreateView):
@@ -263,7 +279,14 @@ class SetAddress(CreateView):
             address.user = request.user
             address.save()
             messages.success(request, 'address set successfully')
-            return redirect('order')
+            return redirect(reverse('order', kwargs = {'pk': kwargs.get('pk')}))
         else:
             errors = address.errors
             return render(request, "form.html", {"errors": errors, "form": address}, status=status.HTTP_400_BAD_REQUEST)
+
+class ListAllOrder(LoginRequiredMixin, ListView):
+    template_name = "order_details.html"
+    context_object_name = "order_details"
+
+    def get_queryset(self):
+        return  OrderDetail.objects.filter(order__user= self.request.user.id)

@@ -85,14 +85,14 @@
                     <a href="{% url 'index' %}"><h4> Category</h4></a>
                 </div>
                 {% endif %}
-
+                {% if perms.user.view_product%}
                 <div class="nav-option option3">
                     <img src="https://media.geeksforgeeks.org/wp-content/uploads/20221210183320/5.png"
                          class="nav-img"
                          alt="report">
                     <a href="{% url 'product_list' %}"><h4> Product</h4></a>
                 </div>
-
+                {% endif %}
 
                 <div class="nav-option option5">
                     <img src="https://media.geeksforgeeks.org/wp-content/uploads/20221210183323/10.png"
@@ -135,6 +135,9 @@
                 </a>
                 {% endif %}
             </div>
+            {% if not categories %}
+            <h4>0 categories available </h4>
+            {% else %}
             {% if perms.user.view_category %}
             <div class="report-body">
                 <table>
@@ -171,6 +174,8 @@
             {% else %}
             <h4> You can't see category !</h4>
             {% endif%}
+            {% endif %}
+
         </div>
     </div>
 </div>

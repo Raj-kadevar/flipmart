@@ -22,10 +22,13 @@ class Cart(admin.ModelAdmin):
     list_display = ["id", "user", "product", "quantity"]
 
 @admin.register(Order)
-class Cart(admin.ModelAdmin):
+class Order(admin.ModelAdmin):
     list_display = ["id", "user", "address"]
 
+@admin.register(OrderDetail)
+class OrderDetail(admin.ModelAdmin):
+    list_display = ["product", "price", "quantity", "order"]
 
 @admin.register(Address)
-class Cart(admin.ModelAdmin):
+class Address(admin.ModelAdmin):
     list_display = ["id", "street1", "street2", "address", "user"]
