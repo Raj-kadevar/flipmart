@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible"
+          content="IE=edge">
+    <meta name="viewport"
+          content="width=device-width,
+                   initial-scale=1.0">
+    <title>Flip-mart</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+
+    <link rel="stylesheet"
+          href="{% static 'css/admin.css' %}">
+    <link rel="stylesheet"
+          href="{% static 'css/responsive.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+
+</head>
+
+<body>
+{% if messages %}
+{% for message in messages %}
+<div class="container-fluid p-0">
+    <div class="message" role="alert">
+        {{ message }}
+        <button type="button" id="close" class="btn btn-success">
+            close
+        </button>
+    </div>
+</div>
+{% endfor %}
+{% endif %}
+<header>
+
+    <div class="logosec">
+        <div class="logo">Flip-mart</div>
+        <img src=
+                     "https://media.geeksforgeeks.org/wp-content/uploads/20221210182541/Untitled-design-(30).png"
+             class="icn menuicn"
+             id="menuicn"
+             alt="menu-icon">
+    </div>
+
+    <div class="searchbar">
+        <input type="text"
+               placeholder="Search">
+        <div class="searchbtn">
+            <img src=
+                         "https://media.geeksforgeeks.org/wp-content/uploads/20221210180758/Untitled-design-(28).png"
+                 class="icn srchicn"
+                 alt="search-icon">
+        </div>
+    </div>
+
+    <div class="message">
+        <div class="circle"></div>
+        <img src=
+                     "https://media.geeksforgeeks.org/wp-content/uploads/20221210183322/8.png"
+             class="icn"
+             alt="">
+        <div class="dp">
+            <img src=
+                         "https://media.geeksforgeeks.org/wp-content/uploads/20221210180014/profile-removebg-preview.png"
+                 class="dpicn"
+                 alt="dp">
+        </div>
+    </div>
+
+</header>
+
+<div class="main-container">
+    <div class="navcontainer">
+        <nav class="nav">
+            <div class="nav-upper-options">
+            {% if perms.user.view_category %}
+                <div class="option2 nav-option">
+                    <img src="https://media.geeksforgeeks.org/wp-content/uploads/20221210183322/9.png"
+                         class="nav-img"
+                         alt="articles">
+                    <a href="{% url 'index' %}"><h4> Category</h4></a>
+                </div>
+            {% endif %}
+                <div class="nav-option option3">
+                    <img src="https://media.geeksforgeeks.org/wp-content/uploads/20221210183320/5.png"
+                         class="nav-img"
+                         alt="report">
+                    <a href="{% url 'product_list' %}"><h4> Product</h4></a>
+                </div>
+
+
+                <div class="nav-option option5">
+                    <img src="https://media.geeksforgeeks.org/wp-content/uploads/20221210183323/10.png"
+                         class="nav-img"
+                         alt="blog">
+                    <h4> Profile</h4>
+                </div>
+
+                <div class="nav-option logout">
+                    <img src="https://media.geeksforgeeks.org/wp-content/uploads/20221210183321/7.png"
+                         class="nav-img"
+                         alt="logout">
+                    <a href="{% url 'logout' %}"><h4> Logout</h4></a>
+                </div>
+
+            </div>
+        </nav>
+    </div>
+    <div class="main">
+
+        <div class="searchbar2">
+            <input type="text"
+                   name=""
+                   id=""
+                   placeholder="Search">
+            <div class="searchbtn">
+                <img src=
+                             "https://media.geeksforgeeks.org/wp-content/uploads/20221210180758/Untitled-design-(28).png"
+                     class="icn srchicn"
+                     alt="search-button">
+            </div>
+        </div>
+        {% if perms.user.view_product %}
+        <div class="report-container">
+            <div class="report-header">
+                <h1 class="recent-Articles">product</h1>
+                {% if perms.user.add_product %}
+                <a href="{% url 'add_product' %}">
+                    <button class="view">Add</button>
+                </a>
+                {% endif %}
+            </div>
+            {% if perms.user.view_product and products %}
+            <div class="report-body">
+                <table>
+                    <tr>
+                        <th class="t-op">product</th>
+                        <th class="t-op">Img_Url</th>
+                        <th class="t-op">type</th>
+                        {% if 'user.change_product' in perms %}
+                        <th class="t-op">Update</th>
+                        {% endif %}
+                        {% if perms.user.change_product %}
+                        <th class="t-op">Delete</th>
+                        {% endif %}
+                    </tr>
+                    {% for product in products %}
+                    <tr>
+                        <td class="t-op-nextlvl">{{product.name}}</td>
+                        <td class="t-op-nextlvl">{{product.image}}</td>
+                        <td class="t-op-nextlvl">{{product.type}}</td>
+                        <td class="t-op-nextlvl">{{product.about}}</td>
+                        {% if 'user.change_product' in perms %}
+                        <td><a href="{% url 'update_product' product.id%}">
+                            <button class="btn btn-primary">Update</button>
+                        </a></td>
+                        {% endif %}
+                        {% if perms.user.change_product %}
+                        <td><a href="{% url 'delete_product' product.id%}">
+                            <button class="btn btn-danger">Delete</button>
+                        </a></td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            {% else %}
+            <h4> You have 0 product !</h4>
+            {% endif%}
+        </div>
+        {% endif %}
+    </div>
+</div>
+</body>
+<script src="{% static 'js/admin.js' %}"></script>
+<script src="{% static 'js/script.js' %}"></script>
+</html>

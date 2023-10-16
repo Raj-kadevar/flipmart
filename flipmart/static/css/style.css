@@ -1,0 +1,27 @@
+.icon-hover:hover {
+  border-color: #3b71ca !important;
+  background-color: white !important;
+}
+
+.icon-hover:hover i {
+  color: #3b71ca !important;
+}
+body{
+  background-color: #F7F7F7;
+}
+p{
+    color:#0069d9;
+    font-size:15px;
+}
+.box{
+    padding:15%;
+}
+.product{
+    width:95%;
+    margin:auto;
+}
+.view_all{
+    margin-left:430px;
+    margin-top:10px;
+    font-size:23px;
+}
